@@ -3,7 +3,6 @@ INSERT INTO authors (author_id, name, birth_year, nationality) VALUES
     ('AUTHOR_001', 'J.K. Rowling', 1965, 'British'),
     ('AUTHOR_002', 'George Orwell', 1903, 'British'),
     ('AUTHOR_003', 'Harper Lee', 1926, 'American');
-    ('AUTHOR_004', 'Jack London', )
 
 -- Insert records into the books table
 -- And include foreign key references to the authors table
