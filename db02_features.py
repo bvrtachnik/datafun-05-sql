@@ -10,7 +10,6 @@ import pathlib
 # Import local modules
 from utils_logger import logger
 
-
 def execute_sql_file(connection, file_path) -> None:
     """
     Executes a SQL file using the provided SQLite connection.
@@ -29,17 +28,14 @@ def execute_sql_file(connection, file_path) -> None:
         logger.error(f"Failed to execute {file_path}: {e}")
         raise
 
-
 def main() -> None:
-
     # Log start of feature execution
     logger.info("Starting feature queries execution...")
 
     # Define path variables
     ROOT_DIR = pathlib.Path(__file__).parent.resolve()
     SQL_FEATURES_FOLDER = ROOT_DIR.joinpath("sql_features")
-    DATA_FOLDER = ROOT_DIR.joinpath("data")
-    DB_PATH = DATA_FOLDER.joinpath('db.sqlite')
+    DB_PATH = ROOT_DIR.joinpath('project.db')  # Updated to match project.db in root folder
 
     # Ensure the database file exists before attempting to connect
     if not DB_PATH.exists():
@@ -61,7 +57,6 @@ def main() -> None:
     finally:
         connection.close()
         logger.info("Database connection closed.")
-
 
 if __name__ == '__main__':
     main()

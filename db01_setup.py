@@ -1,6 +1,6 @@
-'''
-Use Python to create a new relational database and store it in the data folder. 
-'''
+"""
+Use Python to execute feature queries from the sql_features folder.
+"""
 
 # Imports from Python Standard Library
 import sqlite3
@@ -18,14 +18,10 @@ def execute_sql_file(connection, file_path) -> None:
         connection (sqlite3.Connection): SQLite connection object.
         file_path (str): Path to the SQL file to be executed.
     """
-    # We know reading from a file can raise exceptions, so we wrap it in a try block
-    # For example, the file might not exist, or the file might not be readable
     try:
         with open(file_path, 'r') as file:
-            # Read the SQL file into a string
             sql_script: str = file.read()
         with connection:
-            # Use the connection as a context manager to execute the SQL script
             connection.executescript(sql_script)
             logger.info(f"Executed: {file_path}")
     except Exception as e:
@@ -33,37 +29,34 @@ def execute_sql_file(connection, file_path) -> None:
         raise
 
 def main() -> None:
+    # Log start of feature execution
+    logger.info("Starting feature queries execution...")
 
-    # Log start of database setup
-    logger.info("Starting database setup...")
-    
     # Define path variables
     ROOT_DIR = pathlib.Path(__file__).parent.resolve()
-    SQL_CREATE_FOLDER = ROOT_DIR.joinpath("sql_create")
-    DATA_FOLDER = ROOT_DIR.joinpath("data")
-    DB_PATH = DATA_FOLDER.joinpath('db.sqlite')
+    SQL_FEATURES_FOLDER = ROOT_DIR.joinpath("sql_features")
+    DB_PATH = ROOT_DIR.joinpath('project.db')  # Updated to match project.db in root folder
 
-    # Ensure the data folder where we will put the db exists
-    DATA_FOLDER.mkdir(exist_ok=True)
+    # Ensure the database file exists before attempting to connect
+    if not DB_PATH.exists():
+        logger.error(f"Database file not found at {DB_PATH}. Ensure the database is created first.")
+        return
 
-    # Connect to SQLite database (it will be created if it doesn't exist)
+    # Connect to SQLite database
     try:
         connection = sqlite3.connect(DB_PATH)
         logger.info(f"Connected to database: {DB_PATH}")
 
-        # Execute SQL files to set up the database
-        # Pass in the connection and the path to the SQL file to be executed
-        execute_sql_file(connection, SQL_CREATE_FOLDER.joinpath('01_drop_tables.sql'))
-        execute_sql_file(connection, SQL_CREATE_FOLDER.joinpath('02_create_tables.sql'))
-        execute_sql_file(connection, SQL_CREATE_FOLDER.joinpath('03_insert_records.sql'))
+        # Execute all SQL files in the sql_features folder
+        for sql_file in sorted(SQL_FEATURES_FOLDER.glob("*.sql")):
+            execute_sql_file(connection, sql_file)
 
-        logger.info("Database setup completed successfully.")
+        logger.info("Feature queries execution completed successfully.")
     except Exception as e:
-        logger.error(f"Error during database setup: {e}")
+        logger.error(f"Error during feature queries execution: {e}")
     finally:
         connection.close()
         logger.info("Database connection closed.")
-
 
 if __name__ == '__main__':
     main()

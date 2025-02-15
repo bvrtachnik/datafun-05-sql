@@ -1,13 +1,16 @@
+# Import from Python Standard Library first
 import sqlite3
 import pathlib
+
+# Import from external packages
 import pandas as pd
 
-# Use pathlib to ensure correct file paths
-ROOT_DIR = pathlib.Path(__file__).parent
-db_file_path = ROOT_DIR.joinpath("project.db")
-sql_file_path = ROOT_DIR.joinpath("sql", "create_tables.sql")
-author_data_path = ROOT_DIR.joinpath("data", "authors.csv")
-book_data_path = ROOT_DIR.joinpath("data", "books.csv")
+# Define paths using joinpath with correct folder structure
+ROOT_DIR = pathlib.Path(__file__).parent  # Root directory of the project
+db_file_path = ROOT_DIR.joinpath("project.db")  # Database in the root folder
+sql_file_path = ROOT_DIR.joinpath("sql_create", "02_create_tables.sql")  # Correct SQL create path
+author_data_path = ROOT_DIR.joinpath("data", "authors.csv")  # CSV file (optional)
+book_data_path = ROOT_DIR.joinpath("data", "books.csv")  # CSV file (optional)
 
 def verify_and_create_folders(paths):
     """Verify and create folders if they don't exist."""
@@ -50,8 +53,8 @@ def insert_data_from_csv(db_path, author_data_path, book_data_path):
         return
 
     try:
-        authors_df = pd.read_csv(author_data_path, encoding="utf-8")
-        books_df = pd.read_csv(book_data_path, encoding="utf-8")
+        authors_df = pd.read_csv(author_data_path)
+        books_df = pd.read_csv(book_data_path)
         with sqlite3.connect(db_path) as conn:
             authors_df.to_sql("authors", conn, if_exists="replace", index=False)
             books_df.to_sql("books", conn, if_exists="replace", index=False)
@@ -60,12 +63,11 @@ def insert_data_from_csv(db_path, author_data_path, book_data_path):
         print(f"Error inserting data: {e}")
 
 def main():
-    paths_to_verify = [sql_file_path, author_data_path, book_data_path]
+    paths_to_verify = [sql_file_path]  # Only verify SQL path (CSV files removed)
     verify_and_create_folders(paths_to_verify)
     
     create_database(db_file_path)
     create_tables(db_file_path, sql_file_path)
-    insert_data_from_csv(db_file_path, author_data_path, book_data_path)
 
 if __name__ == "__main__":
     main()
